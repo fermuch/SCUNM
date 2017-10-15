@@ -297,7 +297,7 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 Fue en temprana edad que el rey falleció, preso de una extraña enfermedad, dejando a la reina, hermosa como ninguna y de voz suave y dulce, como cabecera del reino.
 El único deseo de la reina era el de continuar el legado de su rey, y crear una nación próspera para sus habitantes. Su reinado fue justo y próspero, pero corto. Ella también sufrió de la misma enfermedad que su esposo, llevándosela de sus tierras a una temprana edad.
 
-Y la corona pasó a la princesa, quien era bonita como capullo de flor brotando al amanecer. Pero su carácter era el polo opuesto a su belleza: Era temperalmenta, le gustaba rodearse de lujos, y aplicaba reglas injustas a los habitantes del reinado. Todos los sirvientes tenían recelo y desprecio hacia ella, excepto uno: su más fiel sirviente. Él lucía igual a ella, ambos nacieron el mismo año, y su corazón le pertenecía a su reina.
+Y la corona pasó a la princesa, quien era bonita como capullo de flor brotando al amanecer. Pero su carácter era el polo opuesto a su belleza: Era temperamental, le gustaba rodearse de lujos, y aplicaba reglas injustas a los habitantes del reinado. Todos los sirvientes tenían recelo y desprecio hacia ella, excepto uno: su más fiel sirviente. Él lucía igual a ella, ambos nacieron el mismo año, y su corazón le pertenecía a su reina.
 No existía deseo de su reina que él no esté dispuesto a hacerlo realidad.
 
 El reinado de la princesa era lejano al de sus padres, donde la tiranía de la princesa hizo que fuera condecorada como "La Hija del Mal", y sus tierras fueron llamadas como "El Reinado del Mal".
@@ -425,7 +425,7 @@ Al lado de tu cama hay algunos objetos.
 			name: 'Habitación Real',
 			descriptions: {
 				0: `
-La habitación de la princesa. Posiblemente la sala más lujuriosa del castillo.
+La habitación de la princesa. Posiblemente la sala más lujosa del castillo.
 
 La princesa no parece encontrarse aquí.
 					`.replace(/^\s+|\s+$/g, '')
@@ -443,7 +443,7 @@ La princesa no parece encontrarse aquí.
 				0: `
 El trono de la Princesa, lugar donde dictamina sus normas y leyes, y toma decisiones en nombre del reino.
 
-La princesa está sentada en el tromo, y te hace un gesto con las manos de que te acerques a ella.
+La princesa está sentada en el trono, y te hace un gesto con las manos de que te acerques a ella.
 					`.replace(/^\s+|\s+$/g, '')
 			},
 			images: {
