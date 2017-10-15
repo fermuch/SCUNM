@@ -6,6 +6,13 @@ function gameReset(game) {
 	initState(game);
 }
 
+function badEndFormatter(text = '') {
+	return `${text}
+~~ BAD END ~~
+( Para volver a jugar, escribe “/restart” (sin comillas) )
+	`.replace(/^\s+|\s+$/g, '')
+}
+
 module.exports.Demo = {
 	meta: {
 		name: 'Sirviente del Mal',
@@ -91,7 +98,9 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 		//verbs: ["jump", "go"]// optional; custom verbs; WARNING: overrides (does not combine with) default verbs
 		//the engine provides handlers for default verbs, custom verbs requires custom handlers in globalCommands section.
 		verbs: [
-			"mirar", "agarrar", "ir", "dar", "hablar", "inventario"
+			'mirar', 'agarrar', 'ir',
+			'dar', 'hablar', 'inventario',
+			'usar'
 		]
 	},
 	globalCommands: {
@@ -119,7 +128,16 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			return this.outPutCreateFromRoom(this.roomGetCurrent());
 		},
 		agarrar(actorId) {
+			const room = this.roomGetCurrent();
+
 			if (!actorId) {
+				if (!room || !room.actors || Object.keys(room.actors).length === 0) {
+					return this.outPutCreateRaw(
+						'No hay nada para agarrar.\n' +
+						'Te llenas los bolsillos de aire, aunque parece escapárcete. ' +
+						'¿Existirán pantalones con bolsillos sellados al vacío?'
+					);
+				}
 				return this.outPutCreateFromRoomActors("¿Agarrar qué cosa?", 'agarrar');
 			}
 
@@ -133,7 +151,6 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 				return outPut;
 			}
 
-			const room = this.roomGetCurrent();
 			outPut = room.agarrar ? room.agarrar(this, actor) : null;
 			if (outPut) {
 				return outPut;
@@ -286,6 +303,99 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			}
 
 			return this.outPutCreateFromActor(actor);
+		},
+		usar(firstActorId, secondActorId) {
+			const nullActor = {
+				id: "",
+				doNotExist: true
+			};
+
+			const noObjectsErr = 'No tienes nada para usar.\nIntentas usar la magia de la amistad, pero no parece hacer nada.';
+
+			let outPut;
+			if (!firstActorId) {
+				const room = this.roomGetCurrent();
+				if (!room || !room.actors || Object.keys(room.actors).length === 0) {
+					return this.outPutCreateRaw(noObjectsErr);
+				}
+				outPut = this.outPutCreateFromRoomActors('¿Usar qué cosa?', 'usar', true);
+				if (!outPut.selection || !outPut.selection.list || outPut.selection.list.length < 1) {
+					return this.outPutCreateRaw(noObjectsErr);
+				}
+				return outPut;
+			}
+
+			if (firstActorId === "inventory") {
+				outPut = this.outPutCreateFromInventory('¿Usar qué cosa?', 'usar');
+				if (outPut.selection.list.length === 0) {
+					return this.outPutCreateRaw('Tienes los bolsillos vacíos');
+				}
+				return outPut;
+			}
+
+			var firstActor =
+				this.actorGetFromCurrentRoom(firstActorId) || this.actorGetFromInventory(firstActorId);
+
+			// el actor existe, no fue eliminado y es visible
+			if (firstActor && !firstActor.state.removed && firstActor.state.visible) {
+				outPut = this.usar ? this.usar(firstActor, nullActor) : null;
+				if (outPut) {
+					return outPut;
+				}
+
+				var room = this.roomGetCurrent();
+				outPut = room.usar ? room.usar(this, firstActor, nullActor) : null;
+				if (outPut) {
+					return outPut;
+				}
+
+				outPut = firstActor.usar ? firstActor.usar(this, nullActor) : null;
+				if (outPut) {
+					return outPut;
+				}
+
+				// Si el primer objeto no da ningún efecto, se espera que el segundo objeto tenga
+				// una utilidad (ej: "usar la botella con...")
+				if (!secondActorId) {
+					return this.outPutCreateFromRoomActors(
+						`¿Usar ${firstActor.name} con qué?`, `usar ${firstActor.id}`, true
+					);
+				}
+
+				if (secondActorId === "inventory") {
+					// si se usa el inventario como segunda opción, abrir el inventario
+					return this.outPutCreateFromInventory(
+						`¿Usar ${firstActor.name} con qué?`, `usar ${firstActor.id}`
+					);
+				}
+
+				// "usar botella en la fuente"
+				var secondActor =
+					this.actorGetFromCurrentRoom(secondActorId) || this.actorGetFromInventory(secondActorId);
+
+				// el actor existe, no fue eliminado y es visible
+				if (secondActor && !secondActor.state.removed && secondActor.state.visible) {
+					outPut = this.use ? this.use(firstActor, secondActor) : null;
+					if (outPut) {
+						return outPut;
+					}
+
+					room = this.roomGetCurrent();
+					outPut = room.use ? room.use(this, firstActor, secondActor) : null;
+					if (outPut) {
+						return outPut;
+					}
+
+					outPut = firstActor.use ? firstActor.use(this, secondActor) : null;
+					if (outPut) {
+						return outPut;
+					}
+
+					return this.outPutCreateRaw('No parece haber funcionado...');
+				}
+			}
+
+			return this.outPutCreateRaw('No puedo usarlo.');//can not find actor to use
 		}
 	},
 	rooms: {
@@ -293,7 +403,7 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			name: "Inicio",
 			descriptions: {
 				0: `
-Érase una vez un reino, construido por un sabio rey, quien dedicó su vida a la mejoría de su reinado.
+Érase una vez un reino, construido por un sabio rey, que dedicó su vida a la mejoría de su reinado.
 Fue en temprana edad que el rey falleció, preso de una extraña enfermedad, dejando a la reina, hermosa como ninguna y de voz suave y dulce, como cabecera del reino.
 El único deseo de la reina era el de continuar el legado de su rey, y crear una nación próspera para sus habitantes. Su reinado fue justo y próspero, pero corto. Ella también sufrió de la misma enfermedad que su esposo, llevándosela de sus tierras a una temprana edad.
 
@@ -310,6 +420,29 @@ Tú, jugador, interpretarás el papel del Sirviente.
 			},
 			exits: {
 				Castillo: "Castillo",
+			},
+			actors: {
+				castillo: {
+					name: 'Castillo',
+					descriptions: {
+						0: 'Un lujoso castillo.'
+					},
+					state: {
+						visible: true,
+						removed: false
+					},
+					agarrar(game) {
+						return game.outPutCreateRaw('Lo intentas, pero es más pesado de lo que creías.');
+					},
+					usar(game) {
+						return game.outPutCreateRaw(`
+Intentas usar el castillo, pero... ¿Cómo usarías un castillo?
+
+Dedicas unos minutos a reflexionar sobre tal dilema, y llegas a la conclusión de que, si fuera de arena, podrías usarlo “pisoteándolo”.
+Tristemente, este castillo no es pisoteable.
+						`.replace(/^\s+|\s+$/g, ''));
+					}
+				}
 			}
 		},
 		Castillo: {
@@ -473,6 +606,7 @@ La princesa está sentada en el trono, y te hace un gesto con las manos de que t
 					},
 					hablar(game) {
 						const princesa = game.actorGetFromCurrentRoom('princesa').state;
+						princesa.timesTalkedTo += 1;
 						if (!princesa.alreadyAcceptedPermission) {
 							princesa.alreadyAcceptedPermission = true;
 							game.inventoryAddItem({
@@ -481,6 +615,24 @@ La princesa está sentada en el trono, y te hace un gesto con las manos de que t
 							});
 							return game.outPutCreateFromAction('princesaDialogoBuscarCaballo');
 						}
+
+						if (princesa.timesTalkedTo == 3) {
+							// le jodiste demasiado a la princesa
+							return game.outPutCreateRaw(`
+¡Len! ¡Para ya! ¡Me tienes harta!
+¡¡Ve y trae mi jodido corcel!!
+							`.replace(/^\s+|\s+$/g, ''))
+						}
+						if (princesa.timesTalkedTo > 3) {
+							// ahora te mata por vivo
+							gameReset(game);
+							game.roomSetCurrent('Inicio');
+							return game.outPutCreateRaw(badEndFormatter(`
+La princesa no soportó más tu insistencia y ordenó colgarte.
+							`.replace(/^\s+|\s+$/g, '')));
+						}
+						
+						
 
 						return game.outPutCreateRaw('La princesa está muy ocupada como para responder a tus necesidades ahora.');
 					},
