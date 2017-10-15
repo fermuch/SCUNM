@@ -74,7 +74,6 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 					`.replace(/^\s+|\s+$/g, '')
 				},
 				dar(game, secondActor) {
-					console.info({game, secondActor});
 					if (secondActor.id !== 'guard') {
 						// Sólo el guardia puede recibir el permiso
 						return;
@@ -384,7 +383,7 @@ Al lado de tu cama hay algunos objetos.
 			exits: {
 				'Volver atrás': 'Castillo'
 			},
-			agarrar(game) {
+			agarrar(game, item) {
 				// al agarrar todos los items, sacar el mensaje de que hay objetos disponibles
 				const room = game.roomGetCurrent();
 				const actors = [];
@@ -395,9 +394,12 @@ Al lado de tu cama hay algunos objetos.
 				if (totalTaken === 2) {
 					room.state.descriptionIndex = 1;
 				}
+				game.inventoryAddItem(item);
+				item.state.removed = true;
+				return game.outPutCreateRaw('Agarraste: ' + item.name);
 			},
 			actors: {
-				monedas: {
+				monedasPieza: {
 					inventoryActor: "monedas",
 					name: 'Bolsa de Monedas',
 					descriptions: {
@@ -407,7 +409,7 @@ Al lado de tu cama hay algunos objetos.
 						0: 'https://i.imgur.com/nYpefyn.gif'
 					}
 				},
-				puñal: {
+				puñalPieza: {
 					inventoryActor: "puñal",
 					name: 'Puñal',
 					descriptions: {
