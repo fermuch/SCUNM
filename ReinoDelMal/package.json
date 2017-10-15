@@ -1,0 +1,12 @@
+{
+	"name": "SCUNM-demo-game",
+	"version": "0.0.0",
+	"description": "Demo game for SCUNM Engine",
+	"main": "Demo.js",
+	"license": "MIT",
+	"repository": "https://github.com/jlvaquero/SCUNM",
+	"author": {
+		"name": "joseluis.vaquero"
+	},
+	"dependencies": {}
+}

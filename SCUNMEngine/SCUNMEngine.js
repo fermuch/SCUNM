@@ -1,4 +1,5 @@
 ﻿module.exports = initEngine();
+module.exports.initState = initState;
 
 function initEngine() {
 	//define Engine constructor
@@ -151,7 +152,7 @@ function injectGameAPI(game) {
 			var item = game.actorGetFromCurrentRoom(id);
 			return { id: id.replace(" ", "_"), name: item.name };
 		});
-		if (showInventory && Object.keys(this.state.inventory).length > 0) list.push({ id: "inventory", name: "inventory" });
+		if (showInventory && Object.keys(this.state.inventory).length > 0) list.push({ id: "inventory", name: "inventario" });
 		return this.outPutCreateRaw(text, null, { command: command, list: list });
 	};
 	//create standard outPut with the list of actors in the inventory.
