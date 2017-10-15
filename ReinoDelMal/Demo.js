@@ -55,8 +55,10 @@ Te entrega una “Solicitud Real del Corcel Real”
 				name: 'Bolsa de Monedas',
 				descriptions: {
 					0: 'Una bolsa de cuero, con monedas de plata dentro.',
-					// al gastar las monedas
-					1: 'Una bolsa de cuero.'
+					1: 'Una bolsa de cuero, con monedas de plata y una aeroventila.',
+					2: 'Una bolsa de cuero, con monedas de plata y dos aeroventilas.',
+					3: 'Una bolsa de cuero, con monedas de plata y tres aeroventilas.',
+					4: 'Una bolsa de cuero, con monedas de plata y muchas aeroventilas.',
 				},
 				images: {
 					0: 'https://i.imgur.com/nYpefyn.gif'
@@ -66,12 +68,39 @@ Te entrega una “Solicitud Real del Corcel Real”
 				name: 'Puñal',
 				descriptions: {
 					0: 'Un puñal. Nunca lo usaste, y esperás no necesitar hacerlo nunca.',
+					1: 'Un puñal. Tiene fragmentos de cuero.',
 					// para cuando mate a miku
-					1: 'Un puñal, rebañado en sangre de una inocente niña.'
+					2: 'Un puñal, rebañado en sangre de una inocente niña.'
 				},
 				images: {
 					0: 'https://i.imgur.com/2egipsH.gif'
 				},
+				usar(game, secondActor) {
+					if (
+						secondActor && secondActor.id === 'monedas'
+					) {
+						const puñal = game.actorGetFromInventory('puñal');
+						if (puñal.state.descriptionIndex === 0) {
+							puñal.state.descriptionIndex = 1;
+						}
+						switch (secondActor.state.descriptionIndex) {
+							case 0:
+								secondActor.state.descriptionIndex = 1;
+								return game.outPutCreateRaw('La bolsa se siente traicionada por tí.');
+							case 1:
+								secondActor.state.descriptionIndex = 2;
+								return game.outPutCreateRaw('La bolsa ya no te dirige la mirada.');
+							case 2:
+								secondActor.state.descriptionIndex = 3;
+								return game.outPutCreateRaw('La bolsa ha perdido la confianza en la humanidad.');
+							case 3:
+								secondActor.state.descriptionIndex = 4;
+								return game.outPutCreateRaw('La bolsa ya no habla. Ya no come. Y todo es tu culpa.');
+							default:
+								return game.outPutCreateRaw('Hacerle más huecos a la bolsa... haría que deje de ser una bolsa.');
+						}
+					}
+				}
 			},
 			permisoReal: {
 				name: 'Solicitud Real del Corcel Real',
@@ -375,18 +404,18 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 
 				// el actor existe, no fue eliminado y es visible
 				if (secondActor && !secondActor.state.removed && secondActor.state.visible) {
-					outPut = this.use ? this.use(firstActor, secondActor) : null;
+					outPut = this.usar ? this.usar(firstActor, secondActor) : null;
 					if (outPut) {
 						return outPut;
 					}
 
 					room = this.roomGetCurrent();
-					outPut = room.use ? room.use(this, firstActor, secondActor) : null;
+					outPut = room.usar ? room.usar(this, firstActor, secondActor) : null;
 					if (outPut) {
 						return outPut;
 					}
 
-					outPut = firstActor.use ? firstActor.use(this, secondActor) : null;
+					outPut = firstActor.usar ? firstActor.usar(this, secondActor) : null;
 					if (outPut) {
 						return outPut;
 					}
@@ -438,7 +467,7 @@ Tú, jugador, interpretarás el papel del Sirviente.
 						return game.outPutCreateRaw(`
 Intentas usar el castillo, pero... ¿Cómo usarías un castillo?
 
-Dedicas unos minutos a reflexionar sobre tal dilema, y llegas a la conclusión de que, si fuera de arena, podrías usarlo “pisoteándolo”.
+Dedicas unos minutos a reflexionar tal dilema, y llegas a la conclusión de que, si fuera de arena, podrías usarlo “pisoteándolo”.
 Tristemente, este castillo no es pisoteable.
 						`.replace(/^\s+|\s+$/g, ''));
 					}
