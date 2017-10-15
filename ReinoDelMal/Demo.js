@@ -8,8 +8,10 @@ function gameReset(game) {
 
 function badEndFormatter(text = '') {
 	return `${text}
+
 ~~ BAD END ~~
-( Para volver a jugar, escribe “/restart” (sin comillas) )
+
+(Para volver a jugar, escribe “/restart”)
 	`.replace(/^\s+|\s+$/g, '')
 }
 
@@ -651,6 +653,33 @@ La princesa está sentada en el trono, y te hace un gesto con las manos de que t
 				0: 'https://i.imgur.com/VrVcwyX.gif'
 			},
 			ir(game) {
+				const room = game.roomGetCurrent();
+				switch(room.state.intentosDeEscaparse) {
+					case 1:
+						room.state.intentosDeEscaparse += 1;
+						return game.outPutCreateRaw(
+							'La Princesa empieza a notar cómo no quieres hablar con ella'
+						);
+					case 2:
+						room.state.intentosDeEscaparse += 1;
+						return game.outPutCreateRaw(
+							'La Princesa hace una mueca de tristeza'
+						);
+					case 3:
+						room.state.intentosDeEscaparse += 1;
+						return game.outPutCreateRaw(
+							'“¡VETE! ¡NO TE NECESITO!”, grita la Princesa.'
+						);
+					case 4:
+						room.state.intentosDeEscaparse += 1;
+						return game.outPutCreateRaw(badEndFormatter(
+							'La Princesa quiebra en lágrimas por no sentir suficiente afecto de tu parte, ' +
+							'y acto seguido un guardia te corta a la mitad con su hacha.'
+						));
+					default:
+						room.state.intentosDeEscaparse = (room.state.intentosDeEscaparse || 0) + 1;
+				}
+
 				const permisoReal = game.actorGetFromInventory('permisoReal');
 				if (!permisoReal) {
 					return game.outPutCreateRaw('Insolente! Cómo te atreves a desobedecer a tu princesa!');
