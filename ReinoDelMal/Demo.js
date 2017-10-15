@@ -13,6 +13,22 @@ function badEndFormatter(text = '') {
 	`.replace(/^\s+|\s+$/g, '')
 }
 
+function visibleActors(actors) {
+	if (!actors) {
+		return [];
+	}
+	return Object.keys(actors).map((actorKey) => {
+		const actor = actors[actorKey];
+		if (
+			actor && actor.state &&
+			actor.state.visible &&
+			!actor.state.removed
+		) {
+			return actor;
+		}
+	}).filter((actor) => actor);
+}
+
 module.exports.Demo = {
 	meta: {
 		name: 'Sirviente del Mal',
@@ -63,6 +79,28 @@ Te entrega una “Solicitud Real del Corcel Real”
 				images: {
 					0: 'https://i.imgur.com/nYpefyn.gif'
 				},
+				usar(game, secondActor) {
+					if (
+						secondActor && secondActor.id === 'puñal'
+					) {
+						if (!secondActor.state.dentroDeBolsita) {
+							secondActor.state.dentroDeBolsita = true;
+							return game.outPutCreateRaw('Metes el puñal en la bolsita');
+						} else {
+							secondActor.state.dentroDeBolsita = false;
+							return game.outPutCreateRaw('Sacas el puñal de la bolsita');
+						}
+					}
+
+					if (
+						secondActor && secondActor.id === 'monedas'
+					) {
+						return game.outPutCreateRaw(
+							'Intentas, con todas tus fuerzas, meter la bolsita dentro de ella misma, ' + 
+							'pero esta tarea prueba ser más difícil de lo que esperabas.'
+						);
+					}
+				}
 			},
 			puñal: {
 				name: 'Puñal',
@@ -97,7 +135,7 @@ Te entrega una “Solicitud Real del Corcel Real”
 								secondActor.state.descriptionIndex = 4;
 								return game.outPutCreateRaw('La bolsa ya no habla. Ya no come. Y todo es tu culpa.');
 							default:
-								return game.outPutCreateRaw('Hacerle más huecos a la bolsa... haría que deje de ser una bolsa.');
+								return game.outPutCreateRaw('Hacerle más huecos a la bolsa... Haría que deje de ser una bolsa.');
 						}
 					}
 				}
@@ -299,7 +337,8 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 		mirar(actorId) {
 			if (!actorId) {
 				const room = this.roomGetCurrent();
-				if (!room || !room.actors || Object.keys(room.actors).length === 0) {
+				console.info(room.actors);
+				if (!room || !room.actors || visibleActors(room.actors).length === 0) {
 					return this.outPutCreateRaw('No hay nada que mirar');
 				}
 				return this.outPutCreateFromRoomActors('¿Qué cosa?', 'mirar');
