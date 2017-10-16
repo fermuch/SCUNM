@@ -92,7 +92,7 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 			var userId = msg.from.id;
 			var storeKey = userId + ":" + engine.name();
 			console.info(
-				`[${msg.from.first_name} ${msg.from.last_name} (@${msg.from.id})]`,
+				`[${msg.from.first_name} ${msg.from.last_name} (${msg.from.id})]`,
 				msg.text || msg.data
 			);
 			var gameState = await store.get(storeKey);
