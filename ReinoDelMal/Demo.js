@@ -603,6 +603,15 @@ Puedes ir a tus aposentos, a la habitación de la princesa, el trono de la princ
 					},
 					hablar(game) {
 						return game.outPutCreateFromAction('youShallNotPass');
+					},
+					agarrar(game) {
+						return game.outPutCreateRaw(
+							'Te acercas al guardia para agarrarlo y llevártelo, pero cuando clava su mirada en ' +
+							'tí, te pones nervioso y rápidamente te acomodas el flequillo, y dices en voz alta que ' +
+							'piensas que deberías cambiar de shampoo, pero después recuerdas que el shampoo ' +
+							'aún no se inventó, mientras el guardia apronta su hacha. Sonríes y retrocedes ' +
+							'lentamente.'
+						);
 					}
 				}
 			},
