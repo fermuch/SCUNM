@@ -91,6 +91,10 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 		bot.onText(new RegExp("^" + verb + "$"), async function (msg) {
 			var userId = msg.from.id;
 			var storeKey = userId + ":" + engine.name();
+			console.info(
+				`[${msg.from.first_name} ${msg.from.last_name} (@${msg.from.id})]`,
+				msg.text || msg.data
+			);
 			var gameState = await store.get(storeKey);
 			engine.setState(JSON.parse(gameState));
 			var outPut = engine.execCommand(verb);
@@ -99,6 +103,7 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 			if (outPut.imgURL) {
 				await bot.sendDocument(userId, outPut.imgURL);
 			}
+			console.info(`[bot ${msg.from.id}] ${outPut.text}`);
 			await bot.sendMessage(userId, outPut.text, {
 				reply_markup: inlineButtons
 			});
@@ -108,6 +113,10 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 	bot.on("callback_query", async function (msg) {
 		var userId = msg.from.id;
 		var storeKey = userId + ":" + engine.name();
+		console.info(
+			`[${msg.from.first_name} ${msg.from.last_name} (${msg.from.id})]`,
+			msg.text || msg.data
+		);
 		var gameState = await store.get(storeKey);
 		engine.setState(JSON.parse(gameState));
 		var clientQuery = parseQueryData(msg.data);
@@ -117,6 +126,7 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 		if (outPut.imgURL) {
 			await bot.sendDocument(userId, outPut.imgURL);
 		}
+		console.info(`[bot ${msg.from.id}] ${outPut.text}`);
 		await bot.sendMessage(userId, outPut.text, {
 			reply_markup: inlineButtons
 		});
