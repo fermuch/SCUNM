@@ -451,13 +451,13 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			}
 			const actor = this.actorGetFromCurrentRoom(actorId);
 			if (!actor) {
-				return this.outPutCreateRaw('No llegas a ver eso');
+				return this.outPutCreateRaw('No ves nada.');
 			}
 			if (
 				!actor.state.visible ||
 				actor.state.removed
 			) {
-				return this.outPutCreateRaw('No llegas a ver eso');
+				return this.outPutCreateRaw('No llegas a distinguir eso');
 			}
 
 			let outPut = this.mirar ? this.mirar(actor) : null;
@@ -570,6 +570,43 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			}
 
 			return this.outPutCreateRaw('No puedo usarlo.');//can not find actor to use
+		},
+		async firmar() {
+			console.info('FIRMAR: ', arguments);
+			if (this.meta.store) {
+				const store = this.meta.store.client;
+				const jsonStore = this.meta.store;
+
+				const firma = arguments['0'];
+				// borrar comando (primer argumento)
+				firma.shift();
+				if (!firma || firma.length === 0) {
+					return this.outPutCreateRaw('Para firmar... Necesitas una firma.');	
+				}
+				await store.lpush('ReinoDelMal:firmas', firma.join(' '));
+				// sólo 5 firmas al mismo tiempo
+				await store.ltrim('ReinoDelMal:firmas', 0, 4);
+
+				return this.outPutCreateRaw('La bruja te dice: “he añadido tu firma a mi bola de cristal”');	
+			} else {
+				return this.outPutCreateRaw('Te quedaste sin tinta mágica.');	
+			}
+		},
+		async mensajesGlobales() {
+			const store = this.meta.store.client;
+			const jsonStore = this.meta.store;
+
+			const keys = await store.lrange('ReinoDelMal:firmas', 0, 4);
+			if (keys && keys.length) {
+				const message = `
+La bola de cristal dice...
+
+${keys.map((k) => '~ ' + k).join('\n')}
+				`.replace(/^\s+|\s+$/g, '');
+				return this.outPutCreateRaw(message);
+			} else {
+				return this.outPutCreateRaw('“Aún nadie ha firmado en la bola de cristal...”');	
+			}
 		}
 	},
 	rooms: {
@@ -883,10 +920,31 @@ Es notorio cómo el país está decayendo.
 						visible: true,
 						removed: false,
 					},
-					hablar(game) {
-						gameReset(game);
-						game.roomSetCurrent('Inicio');
-						return game.outPutCreateFromRoom(game.roomGetCurrent());
+					async hablar(game) {
+						if (game.meta.store) {
+							const store = game.meta.store.client;
+							const jsonStore = game.meta.store;
+
+							const keys = await store.keys('*Sirviente del Mal*');
+							return game.outPutCreateRaw(
+								'Joven muchacho, ¿deseas firmar mi bola de cristal?\n' +
+								'Para hacerlo, dime “firmar mensaje” (sin las comillas), y tu mensaje ' +
+								'aparecerá en mi bola de cristal.',
+								null,
+								{
+									command: 'mensajesGlobales',
+									list: [{
+										id: 'ver',
+										name: 'Ver mensajes'
+									}]
+								}
+							);
+						} else {
+							return game.outPutCreateRaw('La bruja está durmiendo');
+						}
+						// gameReset(game);
+						// game.roomSetCurrent('Inicio');
+						// return game.outPutCreateFromRoom(game.roomGetCurrent());
 					},
 				}
 			}

@@ -26,7 +26,7 @@ function initEngine() {
 
 	Engine.prototype.execCommand = function (verb, dObject, iObject) {
 		this.updatedState = false;
-		outPut = this.assets.globalCommands[verb] ? this.assets.globalCommands[verb].call(this.assets, dObject, iObject) : { text: "What? Try again..." };
+		outPut = this.assets.globalCommands[verb] ? this.assets.globalCommands[verb].call(this.assets, dObject, iObject) : { text: "¿Qué? Intenta de nuevo..." };
 		return outPut;
 	};
 
@@ -45,6 +45,10 @@ function initEngine() {
 	Engine.prototype.reset = function () {
 		this.setState(this.initialState);
 	};
+
+	Engine.prototype.setStore = function (store) {
+		this.assets.meta.store = store;
+	}
 
 	return Engine;
 }

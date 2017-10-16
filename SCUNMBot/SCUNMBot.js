@@ -58,13 +58,13 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 	bot.onText(/^\/start$/, async function (msg, match) {
 		var userId = msg.from.id;
 		var storeKey = userId + ":" + engine.name();
-		var gameState = JSON.parse(await store.get(storeKey));
+		var gameState = await store.get(storeKey, '.');
 		if (!gameState) {
-			store.set(storeKey, JSON.stringify(engine.initialState));
+			store.set(storeKey, '.', engine.initialState);
 			gameState = engine.initialState;
 		}
 		engine.setState(gameState);
-		var outPut = engine.continue();
+		var outPut = await engine.continue();
 		if (outPut.imgURL) {
 			await bot.sendDocument(userId, outPut.imgURL);
 		}
@@ -77,8 +77,8 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 		var userId = msg.from.id;
 		var storeKey = userId + ":" + engine.name();
 		engine.reset();
-		store.set(storeKey, JSON.stringify(engine.getState()));
-		var outPut = engine.continue();
+		store.set(storeKey, '.', engine.getState());
+		var outPut = await engine.continue();
 		if (outPut.imgURL) {
 			await bot.sendDocument(userId, outPut.imgURL);
 		}
@@ -87,18 +87,26 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 		});
 	});
 
-	engine.verbs.forEach(function (verb) {
-		bot.onText(new RegExp("^" + verb + "$"), async function (msg) {
+	// engine.verbs => Object.keys(engine.assets.globalCommands)
+	Object.keys(engine.assets.globalCommands).forEach(function (verb) {
+		bot.onText(new RegExp("^" + verb), async function (msg) {
 			var userId = msg.from.id;
 			var storeKey = userId + ":" + engine.name();
 			console.info(
 				`[${msg.from.first_name} ${msg.from.last_name} (${msg.from.id})]`,
 				msg.text || msg.data
 			);
-			var gameState = await store.get(storeKey);
-			engine.setState(JSON.parse(gameState));
-			var outPut = engine.execCommand(verb);
-			if (engine.updatedState) { store.set(storeKey, JSON.stringify(engine.getState()));}
+			var gameState = await store.get(storeKey, '.');
+			engine.setState(gameState);
+			const argv = parseQueryData(msg.text);
+			var outPut;
+			if (argv.length > 1) {
+				console.info({argv});
+				outPut = await engine.execCommand.apply(engine, [verb, argv]);
+			} else {
+				outPut = await engine.execCommand(verb);
+			}
+			if (engine.updatedState) { store.set(storeKey, '.', engine.getState());}
 			var inlineButtons = createInlineButtons(outPut.selection);
 			if (outPut.imgURL) {
 				await bot.sendDocument(userId, outPut.imgURL);
@@ -117,11 +125,11 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 			`[${msg.from.first_name} ${msg.from.last_name} (${msg.from.id})]`,
 			msg.text || msg.data
 		);
-		var gameState = await store.get(storeKey);
-		engine.setState(JSON.parse(gameState));
+		var gameState = await store.get(storeKey, '.');
+		engine.setState(gameState);
 		var clientQuery = parseQueryData(msg.data);
-		var outPut = engine.execCommand.apply(engine, clientQuery);
-		if (engine.updatedState) { store.set(storeKey, JSON.stringify(engine.getState())); }
+		var outPut = await engine.execCommand.apply(engine, clientQuery);
+		if (engine.updatedState) { store.set(storeKey, '.', engine.getState()); }
 		var inlineButtons = createInlineButtons(outPut.selection);
 		if (outPut.imgURL) {
 			await bot.sendDocument(userId, outPut.imgURL);
