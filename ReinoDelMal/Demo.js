@@ -513,7 +513,7 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 						return outPut;
 					}
 
-					return this.outPutCreateRaw('No parece haber funcionado...');
+					return this.outPutCreateRaw('No tienes la creatividad requerida para realizar esa acción.');
 				}
 			}
 
