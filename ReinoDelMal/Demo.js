@@ -76,7 +76,7 @@ Te entrega una “Solicitud Real del Corcel Real”
 					1: 'Una bolsa de cuero, con monedas de plata y una aeroventila.',
 					2: 'Una bolsa de cuero, con monedas de plata y dos aeroventilas.',
 					3: 'Una bolsa de cuero, con monedas de plata y tres aeroventilas.',
-					4: 'Una bolsa de cuero, con monedas de plata y muchas aeroventilas.',
+					4: 'Una bolsa de cuero, con monedas de plata y muchas aeroventilas. Sufrió un terrible trauma con un puñal.',
 				},
 				images: {
 					0: 'https://i.imgur.com/nYpefyn.gif'
@@ -100,6 +100,31 @@ Te entrega una “Solicitud Real del Corcel Real”
 						return game.outPutCreateRaw(
 							'Intentas, con todas tus fuerzas, meter la bolsita dentro de ella misma, ' + 
 							'pero esta tarea prueba ser más difícil de lo que esperabas.'
+						);
+					}
+
+					if (
+						secondActor && secondActor.id === 'guard'
+					) {
+						return game.outPutCreateRaw(
+							'¿Cómo usarías monedas con el guardia? ¿No estarás pensando en dárselas?'
+						);
+					}
+				},
+				dar(game, secondActor) {
+					if (
+						secondActor && secondActor.id === 'guard'
+					) {
+						game.inventoryRemoveItem(game.actorGetFromInventory('monedas'));
+						return game.outPutCreateRaw(
+							'Le das las monedas al guardia. Él inspecciona la cantidad y, acto seguido, ' +
+							'acomoda el mango del hacha en un hueco que hay en el piso... Y baila de manera ' +
+							'sensual con el hacha como si fuera una bailarina de caño.\n\n' +
+							'Intentas aprovechar la oportunidad para escabullirte fuera del castillo, ' +
+							'pero tus dudas sobre el por qué existe un hueco para apoyar hachas de esa forma ' +
+							'te hace cuestionarte sobre la vida misma.\n' +
+							'(También te preguntas si es un requerimiento para el puesto saber hacer esos ' +
+							'movimientos, pero no te animas a preguntarlo)'
 						);
 					}
 				}
@@ -384,10 +409,10 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 						return outPut;
 					}
 
-					return this.outPutCreateRaw('No puedo dar eso.');
+					return this.outPutCreateRaw('No puedes dar eso.');
 				}
 			}
-			return this.outPutCreateRaw('No puedo dar eso.');
+			return this.outPutCreateRaw('No puedes dar eso.');
 		},
 		mirar(actorId) {
 			if (!actorId) {
