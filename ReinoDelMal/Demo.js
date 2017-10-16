@@ -140,6 +140,39 @@ Te entrega una “Solicitud Real del Corcel Real”
 								return game.outPutCreateRaw('Hacerle más huecos a la bolsa... Haría que deje de ser una bolsa.');
 						}
 					}
+
+					if (
+						secondActor && secondActor.id === 'princesa'
+					) {
+						gameReset(game);
+						game.roomSetCurrent('Inicio');
+						return game.outPutCreateRaw(badEndFormatter(
+							'Usas tu puñal para cortarle un mechón de pelo a la princesa, con el objetivo que ese mechón ' +
+							'te acompañe en tu larga y solitaria jornada... Ella no parece molestarse, ' +
+							'pero causas celos a un guardia su escorta personal, ' +
+							'y él, de manera espectacular, hace que el filo de su hacha ' +
+							'atraviese tu cuello. Dicen que tienes unos segundos desde que te cortan la cabeza ' +
+							'hasta que mueres, y tienen razón: Pasas tus últimos momentos de vida admirando la ' +
+							'impresionante proeza del guardia para hacer un corte tan limpio.'
+						));
+					}
+
+					const room = game.roomGetCurrent();
+					if (
+						secondActor.id === 'permisoReal' && room.id === 'TronoReal'
+					) {
+						gameReset(game);
+						game.roomSetCurrent('Inicio');
+						return game.outPutCreateRaw(badEndFormatter(
+							'Acabaste de destrozar un documento oficial, en frente de tu princesa. ' +
+							'¿Qué extraño pensamiento pasó por tu cabeza? ¿Qué creías que iba a suceder?\n\n' +
+							'Eres encerrado en el calabozo, y mueres de inanición después del sexto día.'
+						));
+					}
+					if (secondActor.id === 'permisoReal') {
+						game.inventoryRemoveItem(secondActor);
+						return game.outPutCreateRaw('Destrozas el documento.');
+					}
 				}
 			},
 			permisoReal: {
@@ -160,12 +193,32 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 					// game.inventoryRemoveItem(this);
 					// diálogo del guardia
 					return game.outPutCreateFromAction('showPermission');
+				},
+				usar(game, secondActor) {
+					if (secondActor && secondActor.id === 'guard') {
+						// el guardia ya no bloquea más el paso
+						secondActor.state.removed = true;
+						game.roomGetCurrent().guardLeft();
+						// game.inventoryRemoveItem(this);
+						// diálogo del guardia
+						return game.outPutCreateFromAction('showPermission');
+					}
+
+					const room = game.roomGetCurrent();
+					if (
+						secondActor && secondActor.id === 'puñal' && room.id === 'TronoReal'
+					) {
+						console.info(room);
+						gameReset(game);
+						game.roomSetCurrent('Inicio');
+						return game.outPutCreateRaw(badEndFormatter(
+							'La Princesa quiebra en lágrimas por no sentir suficiente afecto de tu parte, ' +
+							'y acto seguido un guardia te corta a la mitad con su hacha.'
+						));
+					}
 				}
 			}
 		},
-		//optional //default are ["give", "pick up", "use", "open", "look at", "push", "close", "talk to", "pull", "go", "inventory"];
-		//verbs: ["jump", "go"]// optional; custom verbs; WARNING: overrides (does not combine with) default verbs
-		//the engine provides handlers for default verbs, custom verbs requires custom handlers in globalCommands section.
 		verbs: [
 			'mirar', 'agarrar', 'ir',
 			'dar', 'hablar', 'inventario',
@@ -654,34 +707,37 @@ La princesa está sentada en el trono, y te hace un gesto con las manos de que t
 			},
 			ir(game) {
 				const room = game.roomGetCurrent();
-				switch(room.state.intentosDeEscaparse) {
-					case 1:
-						room.state.intentosDeEscaparse += 1;
-						return game.outPutCreateRaw(
-							'La Princesa empieza a notar cómo no quieres hablar con ella'
-						);
-					case 2:
-						room.state.intentosDeEscaparse += 1;
-						return game.outPutCreateRaw(
-							'La Princesa hace una mueca de tristeza'
-						);
-					case 3:
-						room.state.intentosDeEscaparse += 1;
-						return game.outPutCreateRaw(
-							'“¡VETE! ¡NO TE NECESITO!”, grita la Princesa.'
-						);
-					case 4:
-						room.state.intentosDeEscaparse += 1;
-						return game.outPutCreateRaw(badEndFormatter(
-							'La Princesa quiebra en lágrimas por no sentir suficiente afecto de tu parte, ' +
-							'y acto seguido un guardia te corta a la mitad con su hacha.'
-						));
-					default:
-						room.state.intentosDeEscaparse = (room.state.intentosDeEscaparse || 0) + 1;
+				const princesa = game.actorGetFromCurrentRoom('princesa').state;
+				if (!princesa.alreadyAcceptedPermission) {
+					switch(room.state.intentosDeEscaparse) {
+						case 1:
+							room.state.intentosDeEscaparse += 1;
+							return game.outPutCreateRaw(
+								'La Princesa empieza a notar cómo no quieres hablar con ella'
+							);
+						case 2:
+							room.state.intentosDeEscaparse += 1;
+							return game.outPutCreateRaw(
+								'La Princesa hace una mueca de tristeza'
+							);
+						case 3:
+							room.state.intentosDeEscaparse += 1;
+							return game.outPutCreateRaw(
+								'“¡VETE! ¡NO TE NECESITO!”, grita la Princesa.'
+							);
+						case 4:
+							gameReset(game);
+							game.roomSetCurrent('Inicio');
+							return game.outPutCreateRaw(badEndFormatter(
+								'La Princesa quiebra en lágrimas por no sentir suficiente afecto de tu parte, ' +
+								'y acto seguido un guardia te corta a la mitad con su hacha.'
+							));
+						default:
+							room.state.intentosDeEscaparse = (room.state.intentosDeEscaparse || 0) + 1;
+					}
 				}
 
-				const permisoReal = game.actorGetFromInventory('permisoReal');
-				if (!permisoReal) {
+				if (!princesa.alreadyAcceptedPermission) {
 					return game.outPutCreateRaw('Insolente! Cómo te atreves a desobedecer a tu princesa!');
 				}
 			},
