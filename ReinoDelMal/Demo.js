@@ -194,9 +194,22 @@ Te entrega una “Solicitud Real del Corcel Real”
 							'Eres encerrado en el calabozo, y mueres de inanición después del sexto día.'
 						));
 					}
+					
 					if (secondActor.id === 'permisoReal') {
 						game.inventoryRemoveItem(secondActor);
 						return game.outPutCreateRaw('Destrozas el documento.');
+					}
+
+					if (
+						secondActor.id == 'guard'
+					) {
+						game.inventoryRemoveItem(game.actorGetFromInventory('puñal'));
+						return game.outPutCreateRaw(
+							'Con todas tus fuerzas intentas clavar el puñal en el guardia, pero su armadura ' +
+							'es más dura que el metal de tu puñal, haciéndolo añicos.\n\n' +
+							'El guardia se ríe de tí, haciéndote sentir muy mal contigo mismo y causándote ' +
+							'problemas de autoestima.'
+						);
 					}
 				},
 				dar(game, secondActor) {
@@ -205,8 +218,8 @@ Te entrega una “Solicitud Real del Corcel Real”
 					) {
 						game.inventoryRemoveItem(game.actorGetFromInventory('puñal'));
 						return game.outPutCreateRaw(
-							'Le das el puñal al guardia. Él lo inspecciona detenidamente, y de la nada le pega ' +
-							'un mordisco, quebrándolo en el acto. Se ríe en voz alta y te dice que con eso ' +
+							'Le das el puñal al guardia. Él lo inspecciona detenidamente, y de la nada ¡le pega ' +
+							'un mordisco!, quebrándolo en el acto. Se ríe en voz alta y te dice que con eso ' +
 							'no podrías cortar siquiera el cuello de una doncella de gelatina, aunque, ' +
 							'extrañamente, la gelatina no fue inventada aún, así que no tienes idea de qué ' +
 							'te quiso decir, pero te lo dijo de forma tan seria que se lo crees.'
