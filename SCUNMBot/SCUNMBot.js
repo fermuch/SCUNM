@@ -58,10 +58,17 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 	bot.onText(/^\/start$/, async function (msg, match) {
 		var userId = msg.from.id;
 		var storeKey = userId + ":" + engine.name();
+		const from = msg.from;
+		const username = from.username || `${from.first_name} ${from.last_name}`;
 		var gameState = await store.get(storeKey, '.');
 		if (!gameState) {
-			store.set(storeKey, '.', engine.initialState);
+			store.set(storeKey, '.', {
+				...engine.initialState,
+				username
+			});
 			gameState = engine.initialState;
+		} else {
+			store.set(storeKey, '.username', username);
 		}
 		engine.setState(gameState);
 		var outPut = await engine.continue();

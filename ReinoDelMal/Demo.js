@@ -572,7 +572,10 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			return this.outPutCreateRaw('No puedo usarlo.');//can not find actor to use
 		},
 		async firmar() {
-			console.info('FIRMAR: ', arguments);
+			const room = this.roomGetCurrent();
+			if (room.id !== 'Afueras') {
+				return this.outPutCreateRaw('¿Dónde se supone que quieres firmar?');
+			}
 			if (this.meta.store) {
 				const store = this.meta.store.client;
 				const jsonStore = this.meta.store;
@@ -587,7 +590,7 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 				// sólo 5 firmas al mismo tiempo
 				await store.ltrim('ReinoDelMal:firmas', 0, 4);
 
-				return this.outPutCreateRaw('La bruja te dice: “he añadido tu firma a mi bola de cristal”');	
+				return this.outPutCreateRaw('La bruja te dice: “he añadido tu firma a mi bola de cristal”');
 			} else {
 				return this.outPutCreateRaw('Te quedaste sin tinta mágica.');	
 			}
@@ -890,7 +893,7 @@ La princesa no soportó más tu insistencia y ordenó colgarte.
 			}
 		},
 		Afueras: {
-			name: 'Afueras del Castillo',
+			name: 'Pueblo',
 			descriptions: {
 				0: `
 Fuera del castillo, todo se ve triste y desolado.
