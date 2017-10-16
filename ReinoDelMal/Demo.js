@@ -198,6 +198,20 @@ Te entrega una “Solicitud Real del Corcel Real”
 						game.inventoryRemoveItem(secondActor);
 						return game.outPutCreateRaw('Destrozas el documento.');
 					}
+				},
+				dar(game, secondActor) {
+					if (
+						secondActor && secondActor.id === 'guard'
+					) {
+						game.inventoryRemoveItem(game.actorGetFromInventory('puñal'));
+						return game.outPutCreateRaw(
+							'Le das el puñal al guardia. Él lo inspecciona detenidamente, y de la nada le pega ' +
+							'un mordisco, quebrándolo en el acto. Se ríe en voz alta y te dice que con eso ' +
+							'no podrías cortar siquiera el cuello de una doncella de gelatina, aunque, ' +
+							'extrañamente, la gelatina no fue inventada aún, así que no tienes idea de qué ' +
+							'te quiso decir, pero te lo dijo de forma tan seria que se lo crees.'
+						);
+					}
 				}
 			},
 			permisoReal: {
