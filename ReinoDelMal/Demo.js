@@ -149,7 +149,7 @@ Te entrega una “Solicitud Real del Corcel Real”
 						return game.outPutCreateRaw(badEndFormatter(
 							'Usas tu puñal para cortarle un mechón de pelo a la princesa, con el objetivo que ese mechón ' +
 							'te acompañe en tu larga y solitaria jornada... Ella no parece molestarse, ' +
-							'pero causas celos a un guardia su escorta personal, ' +
+							'pero causas celos a un guardia de su escorta personal, ' +
 							'y él, de manera espectacular, hace que el filo de su hacha ' +
 							'atraviese tu cuello. Dicen que tienes unos segundos desde que te cortan la cabeza ' +
 							'hasta que mueres, y tienen razón: Pasas tus últimos momentos de vida admirando la ' +
