@@ -895,19 +895,10 @@ La princesa no soportó más tu insistencia y ordenó colgarte.
 		Afueras: {
 			name: 'Pueblo',
 			descriptions: {
+				// TODO: mejorar texto
 				0: `
 Fuera del castillo, todo se ve triste y desolado.
 Es notorio cómo el país está decayendo.
-
-
-
-
-
-
-   ~~~ ¡FIN DEL DEMO! ~~~
-(≧▽≦) GRACIAS POR JUGAR (≧▽≦)
-
-(si querés volver a empezar, hablá con la bruja)
 					`.replace(/^\s+|\s+$/g, '')
 			},
 			images: {
