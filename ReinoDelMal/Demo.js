@@ -582,10 +582,10 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 
 				const firma = arguments['0'];
 				// borrar comando (primer argumento)
-				firma.shift();
-				if (!firma || firma.length === 0) {
+				if (!firma || firma.length === 1) {
 					return this.outPutCreateRaw('Para firmar... Necesitas una firma.');	
 				}
+				firma.shift();
 				await store.lpush('ReinoDelMal:firmas', firma.join(' '));
 				// sólo 5 firmas al mismo tiempo
 				await store.ltrim('ReinoDelMal:firmas', 0, 4);
@@ -950,10 +950,10 @@ Es notorio cómo el país está decayendo.
 						// return game.outPutCreateFromRoom(game.roomGetCurrent());
 					},
 				}
+			},
+			exits: {
+				'Castillo': 'Castillo'
 			}
-			// exits: {
-			// 	'Volver atrás': 'Castillo'
-			// }
 		},
 	}
 };

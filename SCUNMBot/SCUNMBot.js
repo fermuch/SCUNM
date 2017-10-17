@@ -96,7 +96,7 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 
 	// engine.verbs => Object.keys(engine.assets.globalCommands)
 	Object.keys(engine.assets.globalCommands).forEach(function (verb) {
-		bot.onText(new RegExp("^" + verb), async function (msg) {
+		bot.onText(new RegExp("^" + verb, 'i'), async function (msg) {
 			var userId = msg.from.id;
 			var storeKey = userId + ":" + engine.name();
 			console.info(
@@ -108,7 +108,6 @@ function setEvents(bot, engine, store, verbsKeyboard) {
 			const argv = parseQueryData(msg.text);
 			var outPut;
 			if (argv.length > 1) {
-				console.info({argv});
 				outPut = await engine.execCommand.apply(engine, [verb, argv]);
 			} else {
 				outPut = await engine.execCommand(verb);
