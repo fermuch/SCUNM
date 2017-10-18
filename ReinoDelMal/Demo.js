@@ -365,7 +365,16 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 			return outPut;
 		},
 		hablar(actorId) {
+			const room = this.roomGetCurrent();
 			if (!actorId) {
+				if (!room || !room.actors || Object.keys(room.actors).length === 0) {
+					return this.outPutCreateRaw(
+						'Hablas contigo mismo por un rato, pero luego recuerdas que te peleaste ' +
+						'contigo y decides no hablarte más. \n\n\n' +
+						'(La pelea fue sobre un sueño que tuviste donde tú y tú discutían quién amaba más ' +
+						'a la princesa)'
+					);
+				}
 				return this.outPutCreateFromRoomActors('¿A quién?', 'hablar');
 			}
 			const actor = this.actorGetFromCurrentRoom(actorId);
@@ -381,7 +390,6 @@ Pergamino que detalla la “Solicitud Real del Corcel Real”, con la firma de l
 				return outPut;
 			}
 
-			const room = this.roomGetCurrent();
 			outPut = room.hablar ? room.hablar(this, actor) : null;
 			if (outPut) {
 				return outPut;
